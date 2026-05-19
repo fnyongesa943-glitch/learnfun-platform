@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Manage Products - LearnFun Admin{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h2>&#128230; Digital Products</h2>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-ghost btn-sm">&#8592; Back to Dashboard</a>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+        <h3 style="font-weight:900;margin-bottom:16px;">&#2795; Add New Product</h3>
+        <form method="POST" action="{{ url_for('admin.add_product') }}" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group" style="margin:0;">
+                <label>Product Name</label>
+                <input type="text" name="name" class="form-control" placeholder="e.g. Alphabet Worksheet Pack" required>
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Price (KES)</label>
+                <input type="number" name="price" class="form-control" placeholder="e.g. 100" required>
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Emoji</label>
+                <input type="text" name="emoji" class="form-control" value="&#128196;" placeholder="&#128196;">
+            </div>
+            <div class="form-group" style="margin:0;">
+                <label>Category</label>
+                <select name="category" class="form-control">
+                    <option value="worksheet">Worksheet</option>
+                    <option value="learning_pack">Learning Pack</option>
+                    <option value="ebook">eBook</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin:0;grid-column:span 2;">
+                <label>Description</label>
+                <input type="text" name="description" class="form-control" placeholder="Brief description">
+            </div>
+            <button type="submit" class="btn btn-primary" style="grid-column:span 2;">&#128722; Add Product</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3 style="font-weight:900;margin-bottom:16px;">&#128220; All Products</h3>
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Emoji</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Active</th>
+                        <th>Toggle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.id }}</td>
+                        <td style="font-size:1.5rem;">{{ product.emoji }}</td>
+                        <td><strong>{{ product.name }}</strong></td>
+                        <td>KES {{ product.price }}</td>
+                        <td>{{ product.category }}</td>
+                        <td>
+                            {% if product.is_active %}
+                            <span style="color:var(--accent-green);font-weight:800;">&#9679; Active</span>
+                            {% else %}
+                            <span style="color:var(--text-light);font-weight:800;">&#9679; Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.toggle_product', product_id=product.id) }}" class="btn btn-sm btn-secondary">
+                                {% if product.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" style="text-align:center;color:var(--text-light);">No products yet. Add one above!</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

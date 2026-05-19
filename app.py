@@ -38,6 +38,7 @@ def create_app():
     from blueprints.lessons import lessons_bp
     from blueprints.story_mode import story_mode_bp
     from blueprints.payments import payments_bp
+    from blueprints.admin import admin_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -48,6 +49,7 @@ def create_app():
     app.register_blueprint(lessons_bp, url_prefix='/lessons')
     app.register_blueprint(story_mode_bp, url_prefix='/adventure')
     app.register_blueprint(payments_bp)
+    app.register_blueprint(admin_bp)
 
     @app.context_processor
     def inject_user():
@@ -69,7 +71,7 @@ def create_app():
                 return False
             return True
 
-        return {'current_user': user, 'check_premium': check_premium}
+        return {'current_user': user, 'check_premium': check_premium, 'now': datetime.utcnow()}
 
     def send_weekly_reports():
         with app.app_context():

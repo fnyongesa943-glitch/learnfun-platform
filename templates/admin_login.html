@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Admin Login - LearnFun{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-icon">&#128272;</div>
+        <h2>Admin Access</h2>
+        <p>Enter the admin PIN to manage the platform.</p>
+
+        <form method="POST" action="{{ url_for('admin.check_pin') }}">
+            <div class="form-group">
+                <label for="pin">Admin PIN</label>
+                <input type="password" id="pin" name="pin" class="form-control" placeholder="Enter admin PIN" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;">&#128274; Unlock Dashboard</button>
+        </form>
+
+        <p style="margin-top:var(--space-md);font-size:0.8rem;color:var(--text-light);">
+            Default PIN: <strong>1234</strong>
+        </p>
+    </div>
+</div>
+{% endblock %}

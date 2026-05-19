@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - LearnFun{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="section-header">
+        <h2>&#128736;&#65039; Admin Dashboard</h2>
+        <a href="{{ url_for('admin.logout') }}" class="btn btn-ghost btn-sm">&#128682; Logout</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon-wrap blue">&#128101;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap green">&#128081;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ premium_users }}</div>
+                <div class="stat-label">Premium Users</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap yellow">&#128200;</div>
+            <div class="stat-info">
+                <div class="stat-value">KES {{ total_revenue }}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon-wrap pink">&#128179;</div>
+            <div class="stat-info">
+                <div class="stat-value">{{ total_payments }}</div>
+                <div class="stat-label">Successful Payments</div>
+            </div>
+        </div>
+    </div>
+
+    {% if expired_users > 0 %}
+    <div class="flash flash-warning" style="margin-bottom:20px;">
+        &#9888;&#65039; {{ expired_users }} premium subscription(s) have expired and need renewal.
+    </div>
+    {% endif %}
+
+    <!-- Users -->
+    <div class="card" style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="font-weight:900;">&#128101; All Users</h3>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Plan</th>
+                        <th>Expiry</th>
+                        <th>Phone</th>
+                        <th>Points</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>
+                            <span style="font-size:1.2rem;">{{ user.avatar }}</span>
+                            {{ user.username }}
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.is_premium %}
+                            <span class="premium-badge">&#128081; Premium</span>
+                            {% else %}
+                            <span class="free-badge">&#127793; Free</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size:0.85rem;">
+                            {% if user.subscription_expiry %}
+                            {{ user.subscription_expiry.strftime('%d %b %Y') }}
+                            {% if user.subscription_expiry < now %}<br><span style="color:var(--danger);font-weight:700;">EXPIRED</span>{% endif %}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ user.phone_number or '-' }}</td>
+                        <td>{{ user.total_points }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.toggle_premium', user_id=user.id) }}" class="btn btn-sm {% if user.is_premium %}btn-warning{% else %}btn-success{% endif %}">
+                                {% if user.is_premium %}&#128683; Revoke{% else %}&#128081; Grant{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Payments -->
+    <div class="card" style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="font-weight:900;">&#128179; Recent Payments</h3>
+            <a href="{{ url_for('admin.manage_products') }}" class="btn btn-secondary btn-sm">&#128230; Manage Products</a>
+        </div>
+        <div style="overflow-x:auto;">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Phone</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Transaction</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ p.id }}</td>
+                        <td>{{ p.user.username if p.user else '-' }}</td>
+                        <td>{{ p.phone_number }}</td>
+                        <td><strong>KES {{ p.amount }}</strong></td>
+                        <td>
+                            {% if p.status == 'success' %}
+                            <span style="color:var(--accent-green);font-weight:800;">&#10003; Success</span>
+                            {% elif p.status == 'pending' %}
+                            <span style="color:var(--accent-yellow);font-weight:800;">&#8987; Pending</span>
+                            {% else %}
+                            <span style="color:var(--danger);font-weight:800;">&#10007; {{ p.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-size:0.75rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;">
+                            {{ p.transaction_id or '-' }}
+                        </td>
+                        <td style="font-size:0.85rem;">{{ p.timestamp.strftime('%d %b %Y %H:%M') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" style="text-align:center;color:var(--text-light);">No payments yet</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
